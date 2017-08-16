@@ -45,7 +45,7 @@ Rs = 0b00000001 #register select
 
 class lcd:
     def __init__(self):
-        self.lcd_device = i2c_device.i2c_device(ADRESS)
+        self.lcd_device = i2c_device.i2c_device(ADDRESS)
 
         self.lcd_write(0x03)
         self.lcd_write(0x03)
@@ -61,12 +61,12 @@ class lcd:
     def lcd_strobe(self, data):
         self.lcd_device.write_cmd(data | En | LCD_BACKLIGHT)
         sleep(0.0005)
-        self.lcd_device.write(((data & ~En) | LCD_BACKLIGHT))
+        self.lcd_device.write_cmd(((data & ~En) | LCD_BACKLIGHT))
         sleep(0.0001)
 
     def lcd_write_four_bits(self, data):
         self.lcd_device.write_cmd(data | LCD_BACKLIGHT)
-        self.lcd_strode(data)
+        self.lcd_strobe(data)
 
     def lcd_write(self, cmd, mode=0):
         self.lcd_write_four_bits(mode | (cmd & 0xF0))
