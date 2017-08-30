@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import serial
+from i2c import lcddriver
 
 """ The GPS transmits the following datas:
     - GNGLL
@@ -28,7 +29,7 @@ class GPS:
         self.longitude["indicator"] = "E"
 
     def __str__(self):
-        return "{} | {}".format(self.get_latitude_str(),
+        return "{}|{}".format(self.get_latitude_str(),
                                 self.get_longitude_str())
 
     def get_latitude_str(self):
@@ -64,8 +65,26 @@ class GPS:
         self.gnrmc_decode(line.split(','))
 
 
+class GPSScreen:
+
+    def __init__(self, gps):
+        self.gps = gps
+        self.lcd = lcddriver.lcd()
+
+    def clear(self):
+        self.lcd.lcd_clear()
+
+    def display(self):
+        self.lcd.lcd_display_string(str(gps), 1)
+
+    def update(self):
+        self.gps.update()
+        self.clear()
+        self.display()
+
+
 if __name__ == "__main__":
     gps = GPS("/dev/ttyUSB0")
+    gps_screen = GPSScreen(gps)
     while True:
-        gps.update()
-        print(gps)
+        gps_screen.update()

@@ -1,4 +1,4 @@
-import i2c_device
+from . import i2c_device
 from time import *
 
 ADDRESS = 0x27
