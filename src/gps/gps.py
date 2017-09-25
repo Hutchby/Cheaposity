@@ -86,5 +86,9 @@ class GPSScreen:
 if __name__ == "__main__":
     gps = GPS("/dev/ttyUSB0")
     gps_screen = GPSScreen(gps)
-    while True:
-        gps_screen.update()
+    try:
+        while True:
+            gps_screen.update() 
+    except KeyboardInterrupt:
+        gps_screen.clear()
+        sys.exit()
