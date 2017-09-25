@@ -19,11 +19,8 @@ def close(signal, frame):
 
 signal.signal(signal.SIGINT, close)
 GPIO.setup(pinM1, GPIO.OUT)
-#GPIO.setup(pinM2, GPIO.OUT)
-
-
 p = GPIO.PWM(pinM1, 10)
-p.start(100) #ici, rapport_cyclique vaut entre 0.0 et 100.0
+p.start(100) #rapport_cyclique vaut entre 0.0 et 100.0
 
 while True:
         continue
