@@ -12,8 +12,8 @@ class Motor:
         self.pinspeed = pin_speed
         self.posmot = pin_pos_mot
         self.negmot = pin_neg_mot
-        GPIO.setup(self.posmot, GPIO.OUT)
-        GPIO.setup(self.negmot, GPIO.OUT)
+        GPIO.setup(self.posmot,   GPIO.OUT)
+        GPIO.setup(self.negmot,   GPIO.OUT)
         GPIO.setup(self.pinspeed, GPIO.OUT)
         self.pwmspeed = GPIO.PWM(pin_speed, 1)
         # default rotation direction
@@ -27,22 +27,26 @@ class Motor:
         self.pulls = pullspeed
         return
 
+    def polarity(pol):
+        if pol:
+            GPIO.output(self.negmot, GPIO.LOW)
+            GPIO.output(self.posmot, GPIO.HIGH)
+        else:
+            GPIO.output(self.negmot, GPIO.LOW)
+            GPIO.output(self.posmot, GPIO.HIGH)
+        return
+
+    def run(self, speed, pol):
+        self.polarity(pol)
+        self.pwmspeed.start(speed * coeff)
+        return
+
     def stop():
         self.pwmspeed.stop()
         return
 
     def start():
         self.pwmspeed.start(speed)
-        return
-
-    def reverse():
-        if polarity:
-            GPIO.output(self.negmot, GPIO.LOW)
-            GPIO.output(self.posmot, GPIO.HIGH)
-        else:
-            GPIO.output(self.negmot, GPIO.LOW)
-            GPIO.output(self.posmot, GPIO.HIGH)
-
         return
 
     def reset():
