@@ -3,7 +3,6 @@ import time
 import signal
 import sys
 
-sign = lambda x: math.copysign(1, x)
 
 class Motor:
     def __init__(self, pin_speed, pin_pos_mot, pin_neg_mot,
@@ -30,27 +29,36 @@ class Motor:
         GPIO.setup(self.negmot, GPIO.OUT)
         return
 
+
+    def stop():
+        self.pwmspeed.stop()
+        GPIO.output(self.negmot, GPIO.LOW)
+        GPIO.output(self.posmot, GPIO.LOW)
+        return
+
+
     def polarity(pol):
         if pol:
-            GPIO.output(self.negmot, GPIO.LOW)
-            GPIO.output(self.posmot, GPIO.HIGH)
+            GPIO.output(self.negmot, GPIO.HIGH)
+            GPIO.output(self.posmot, GPIO.LOW)
         else:
             GPIO.output(self.negmot, GPIO.LOW)
             GPIO.output(self.posmot, GPIO.HIGH)
         return
 
+
     def run(self, speed):
-        self.polarity(sign(speed))
+        self.polarity(0<speed)
         self.pwmspeed.start(abs(speed))
+        if speed == 0:
+            self.stop()
         return
-        
-    def stop():
-        self.pwmspeed.stop()
-        return
+
 
     def start():
         self.pwmspeed.start(speed)
         return
+
 
     def reset():
         self.stop()
