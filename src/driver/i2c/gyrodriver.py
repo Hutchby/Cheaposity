@@ -1,4 +1,4 @@
-import i2c_device
+from i2c import i2c_device
 import time
 
 ADDRESS         = 0x68
