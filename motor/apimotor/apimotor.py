@@ -29,6 +29,11 @@ class Motor:
         GPIO.setup(self.negmot, GPIO.OUT)
         return
 
+    def output(self, pos, neg, speed):
+        GPIO.output(self.posmot, pos)
+        GPIO.output(self.negmot, neg)
+        GPIO.output(self.speedmot, speed)
+        return
 
     def stop(self):
         self.pwmspeed.stop()
@@ -52,15 +57,4 @@ class Motor:
         self.pwmspeed.start(abs(speed))
         if speed == 0:
             self.stop()
-        return
-
-
-    def start(self):
-        self.pwmspeed.start(speed)
-        return
-
-
-    def reset(self):
-        self.stop()
-
         return
