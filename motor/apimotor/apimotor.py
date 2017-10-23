@@ -16,7 +16,7 @@ class Motor:
         self.posmot = pin_pos_mot
         self.negmot = pin_neg_mot
         # default rotation direction
-        self.polarity = polarity
+        #self.polarity = polarity
         # if a motor is slower or faster than other,
         # set a coeff to reduce the stronger one
         self.coeff = coeff
@@ -30,14 +30,14 @@ class Motor:
         return
 
 
-    def stop():
+    def stop(self):
         self.pwmspeed.stop()
         GPIO.output(self.negmot, GPIO.LOW)
         GPIO.output(self.posmot, GPIO.LOW)
         return
 
 
-    def polarity(pol):
+    def polarity(self, pol):
         if pol:
             GPIO.output(self.negmot, GPIO.HIGH)
             GPIO.output(self.posmot, GPIO.LOW)
@@ -55,12 +55,12 @@ class Motor:
         return
 
 
-    def start():
+    def start(self):
         self.pwmspeed.start(speed)
         return
 
 
-    def reset():
+    def reset(self):
         self.stop()
 
         return

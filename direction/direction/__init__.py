@@ -19,7 +19,13 @@ mconf is the number of motor used
 2: all motors
 """
 
-sign = lambda x: math.copysign(1, x)
+def signal_handler(signal, frame):
+    print('You pressed Ctrl+C!')
+    GPIO.cleanup()
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
 
 class Direction:
 
@@ -38,10 +44,10 @@ class Direction:
 
 
     def apply(self, s1, s2, s3, s4):
-        if mconf == 0 or mconf == 2:
+        if self.mconf == 0 or self.mconf == 2:
             self.m1.run(s1)
             self.m4.run(s4)
-        if mconf == 1 or mconf == 2:
+        if self.mconf == 1 or self.mconf == 2:
             self.m2.run(s2)
             self.m3.run(s3)
         return
@@ -88,15 +94,21 @@ class Direction:
 if __name__ == '__main__':
     print("test")
     rover=Direction(M1=Motor(21, 20, 16), M4=Motor(24, 12, 25), config=0)
+    
+    '''
     print("rover._run(10,1)")
     rover._run(10,1)
     time.sleep(5)
-    print("rover._run(10,1)")
+    print("rover._run(10,-1)")
     rover._run(10,-1)
+    time.sleep(5)
     print("rover._rotate(10,1)")
     rover._rotate(10,1)
+    time.sleep(5)
+    rover._run(0, 1)
+    #   '''
 
-    '''
+    # '''
     gamepad = InputDevice('/dev/input/event0')
     aBtn = 315
     bBtn = 311
@@ -110,20 +122,20 @@ if __name__ == '__main__':
         #filters by event type
         speed=50
         if event.type == ecodes.EV_KEY:
-            print(event)
+            #print(event)
             if event.value == 1:
                 if event.code == xBtn:
                     print("X")
-                    _run(speed, 1)
+                    rover._run(speed, 1)
                 elif event.code == yBtn:
                     print("Y")
-                    _rotate(speed, -1)
+                    rover._rotate(speed, -1)
                 elif event.code == bBtn:
                     print("B")
-                    _run(speed, -1)
+                    rover._run(speed, -1)
                 elif event.code == aBtn:
                     print("A")
-                    _rotate(speed, -1)
+                    rover._rotate(speed, 1)
 
                 elif event.code == start:
                     print("Start")
@@ -133,5 +145,6 @@ if __name__ == '__main__':
                     speed-=10
                 elif event.code == Trig:
                     print("Bumper")
-                    self.clean()
-'''
+                    rover._run(0, 1)
+#'''
+    GPIO.cleanup()
