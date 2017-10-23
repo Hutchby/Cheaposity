@@ -87,7 +87,14 @@ class Direction:
 
 if __name__ == '__main__':
     print("test")
-    rover=Direction(M1=Motor(21, 20, 16), M4=Motor(12, 24, 25), config=0)
+    rover=Direction(M1=Motor(21, 20, 16), M4=Motor(24, 12, 25), config=0)
+    print("rover._run(10,1)")
+    rover._run(10,1)
+    time.sleep(5)
+    print("rover._run(10,1)")
+    rover._run(10,-1)
+    print("rover._rotate(10,1)")
+    rover._rotate(10,1)
 
     '''
     gamepad = InputDevice('/dev/input/event0')
