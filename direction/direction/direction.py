@@ -1,5 +1,7 @@
 import sys
-from apimotor import *
+import time
+import apimotor
+import signal
 from evdev import InputDevice, categorize, ecodes
 
 """
@@ -21,6 +23,7 @@ mconf is the number of motor used
 
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
+    rover._run(0, 1)
     GPIO.cleanup()
     sys.exit(0)
 
@@ -92,7 +95,7 @@ class Direction:
 
 if __name__ == '__main__':
     print("test")
-    rover=Direction(M1=Motor(21, 20, 16), M4=Motor(24, 12, 25), config=0)
+    rover=Direction(M1=apimotor.Motor(0), M4=apimotor.Motor(1), config=0)
     
     '''
     print("rover._run(10,1)")
@@ -107,7 +110,7 @@ if __name__ == '__main__':
     rover._run(0, 1)
     #   '''
 
-    # '''
+    #'''
     gamepad = InputDevice('/dev/input/event0')
     aBtn = 315
     bBtn = 311
@@ -116,10 +119,10 @@ if __name__ == '__main__':
     start = 305
     select = 314
     Trig = 313
+    speed=1
 
     for event in gamepad.read_loop():
         #filters by event type
-        speed=50
         if event.type == ecodes.EV_KEY:
             #print(event)
             if event.value == 1:
@@ -138,12 +141,21 @@ if __name__ == '__main__':
 
                 elif event.code == start:
                     print("Start")
-                    speed+=10
+                    speed = speed + 5
+                    print("Speed: ", speed)
                 elif event.code == select:
                     print("Select")
-                    speed-=10
+                    speed = speed - 5
+                    print("Speed: ", speed)
                 elif event.code == Trig:
                     print("Bumper")
                     rover._run(0, 1)
-#'''
+    #'''
+    '''
+    while True:
+        rover._run(1, 1)
+        time.sleep(10)
+        rover._run(100, 1)
+        time.sleep(10)
+    #'''
     GPIO.cleanup()
