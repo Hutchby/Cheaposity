@@ -2,6 +2,7 @@ import sys
 import time
 import apimotor
 import signal
+from pathlib import Path
 from evdev import InputDevice, categorize, ecodes
 
 """
@@ -74,44 +75,17 @@ class Direction:
     def stop(self):
         self.clean()
         return
-    '''
-    #use clockwise +-180
-    def rotate(self, speed, angle):
-        self._rotate(speed, sign(angle))
-        while(true):
-            break #continue
-        self.stop()
-        return
-
-    #direction +-1, exclude 0
-    def run(self, speed, direction):
-        self._run(speed, direction)
-        while(true):
-            break #continue
-        self.stop()
-        return
-    # '''
 
 
 if __name__ == '__main__':
-    print("test")
-    rover=Direction(M1=apimotor.Motor(0), M4=apimotor.Motor(1), config=0)
-    
-    '''
-    print("rover._run(10,1)")
-    rover._run(10,1)
-    time.sleep(5)
-    print("rover._run(10,-1)")
-    rover._run(10,-1)
-    time.sleep(5)
-    print("rover._rotate(10,1)")
-    rover._rotate(10,1)
-    time.sleep(5)
-    rover._run(0, 1)
-    #   '''
+    print("Demo: Motor test")
 
-    #'''
-    gamepad = InputDevice('/dev/input/event0')
+    if not Path("/dev/input/event0").is_file():
+        print('No Bluetooth Controler for test')
+        sys.exit(0)
+
+    rover=Direction(M1=apimotor.Motor(0), M4=apimotor.Motor(1), config=0)
+    gamepad = InputDevice('/dev/input/event0')        
     aBtn = 315
     bBtn = 311
     xBtn = 307
@@ -150,12 +124,4 @@ if __name__ == '__main__':
                 elif event.code == Trig:
                     print("Bumper")
                     rover._run(0, 1)
-    #'''
-    '''
-    while True:
-        rover._run(1, 1)
-        time.sleep(10)
-        rover._run(100, 1)
-        time.sleep(10)
-    #'''
     GPIO.cleanup()

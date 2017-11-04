@@ -11,13 +11,12 @@ class Motor:
     def __init__(self, pin, polarity=False, pullspeed=0, coeff=1):
         if GPIO.getmode() == None:
             GPIO.setmode(GPIO.BCM)
-        #pins
+        self.pin = pin
         self.adapwm = Adafruit_PCA9685.PCA9685()
         self.adapwm.set_pwm_freq(60)
         self.pwmmin = 250
         self.pwmmax = 500
         self.pwmmean = int((self.pwmmax + self.pwmmin) / 2)
-        self.pin = pin
         self.coeff = coeff
         return
 
@@ -28,13 +27,13 @@ class Motor:
     
     def pwm(self, speed):
         self.speed = speed
-        self.adapwm.set_pwm(self.pin, 0, self.convert(speed))
+        self.adapwm.set_pwm(self.pin, 0, self.convert(speed * coeff))
         return
 
     
     def start(self, speed):
         self.pwm(speed)
-        print("pin: ", self.pin, " pwm:", self.convert(speed), "(", speed, ")")
+        #print("pin: ", self.pin, " pwm:", self.convert(speed), "(", speed, ")")
         return
 
     
