@@ -13,35 +13,37 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.post_data = self.rfile.read(rfile_len)
         qs = self.post_data.decode("utf-8")
         args = urllib.parse.parse_qs(qs)
-        method = None
+        errors = []
+        messages = []
         for key in args.keys():
             try:
-                method = getattr(self.server, "do_" + key)
-            except e:
-                method = None
-                break
+                method = getattr(self.server, "do_POST_" + key)
+                message = "method: {} executed".format("do_POST_" + key)
+                messages.append(message)
+            except Exception:
+                error_message = "error: method {} not implemented".format("do_POST_" + key)
+                errors.append(error_message)
+                continue
             method(self.server, data=args[key])
-        if not method:
+        if errors:
             self.send_response(501)
             self.send_header("content-type", "application/json")
             self.end_headers()
-            error_message = "error: method not implemented"
-            self.wfile.write(json.dumps(error_message).encode("utf-8"))
+            self.wfile.write(json.dumps(errors).encode("utf-8"))
         else:
             self.send_response(200)
             self.send_header("content-type", "application/json")
             self.end_headers()
-            message = "method: {} executed".format(method)
-            self.wfile.write(json.dumps(message).encode("utf-8"))
+        self.wfile.write(json.dumps(messages).encode("utf-8"))
 
 
-class Server(HTTPServer, ThreadingMixIn):
+class PrintServer(HTTPServer, ThreadingMixIn):
 
-    def do_print(self, *args, **kwargs):
-        print(kwargs['data'])
+    def do_POST_print(self, *args, **kwargs):
+        print(kwargs['data'][0])
 
 
 if __name__ == "__main__":
     print("Launching HTTP server")
-    server = Server(("0.0.0.0", 8888), RequestHandler)
+    server = PrintServer(("0.0.0.0", 8888), RequestHandler)
     server.serve_forever()
