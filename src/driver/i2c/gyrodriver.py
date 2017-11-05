@@ -90,7 +90,7 @@ class MPU9250:
 
 
     def readAccel(self):
-        data = self.mpu_device.read_i2c_block_data(GYRO_CONFIG, 6)
+        data = self.mpu_device.read_i2c_block_data(ACCEL_OUT, 6)
         x = self.dataConv(data[1], data[0])
         y = self.dataConv(data[3], data[2])
         z = self.dataConv(data[5], data[4])
@@ -99,6 +99,18 @@ class MPU9250:
         y = round(y * self.ares, 3)
         z = round(z * self.ares, 3)
 
+        return {"x":x, "y":y, "z":z}
+
+    def readGyro(self):
+        data = self.mpu_device.read_i2c_block_data(GYRO_OUT, 6)
+        
+        x = self.dataConv(data[1], data[0])
+        y = self.dataConv(data[3], data[2])
+        z = self.dataConv(data[5], data[4])
+        x = round(x * self.gres, 3)
+        y = round(y * self.gres, 3)
+        x = round(z * self.gres, 3)
+    
         return {"x":x, "y":y, "z":z}
 
     def dataConv(self, data1, data2):
