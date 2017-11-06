@@ -3,6 +3,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 import urllib.parse
+from urllib.parse import unquote
 import json
 from pprint import pprint
 
@@ -12,7 +13,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         rfile_len = int(self.headers['content-length'])
         self.post_data = self.rfile.read(rfile_len)
         qs = self.post_data.decode("utf-8")
-        args = urllib.parse.parse_qs(qs)
+        qs = unquote(qs)
+        args = urllib.parse.parse_qsl(qs)
+        args = dict(args)
         errors = []
         messages = []
         for key in args.keys():
@@ -24,7 +27,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                 error_message = "error: method {} not implemented".format("do_POST_" + key)
                 errors.append(error_message)
                 continue
-            method(self.server, data=args[key])
+            method_data = args[key].replace("'", "\"")
+            method(self.server, data=json.loads(method_data))
         if errors:
             self.send_response(501)
             self.send_header("content-type", "application/json")
@@ -36,12 +40,29 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
         self.wfile.write(json.dumps(messages).encode("utf-8"))
 
+    def do_GET(self):
+        try:
+            self.path = unquote(self.path)
+            path = self.path.split("?")
+            path[0] = path[0][1:]
+            method = getattr(self.server, "do_GET_" + path[0])
+            method_kwargs = dict(urllib.parse.parse_qsl(path[1]))
+        except Exception as e:
+            print(e)
+        response = method(self.server, **method_kwargs)
+        self.send_response(200)
+        self.send_header('content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(response).encode('utf-8'))
+
 
 class PrintServer(HTTPServer, ThreadingMixIn):
 
     def do_POST_print(self, *args, **kwargs):
-        print(kwargs['data'][0])
+        print(kwargs)
 
+    def do_GET_status(self, *args, **kwargs):
+        print(kwargs)
 
 if __name__ == "__main__":
     print("Launching HTTP server")
