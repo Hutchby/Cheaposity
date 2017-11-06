@@ -2,6 +2,7 @@ from i2c import i2c_device
 import time
 
 ADDRESS         = 0x68
+ADDRESS_AK8963  = 0x0c
 
 DEVICE_ID       = 0x71
 
@@ -42,11 +43,70 @@ AFS_4G      = 0x01
 AFS_8G      = 0x02
 AFS_16G     = 0x03
 
+AK8963_ST1          = 0x02
+AK8963_MAGNET_OUT   = 0x03
+AK8963_CNTL1        = 0x0A
+AK8963_CNTL2        = 0x0B
+AK8963_ASAX         = 0x10
 
-class MPU9250:
+AK8963_MODE_DOWN    = 0x00
+AK8963_MODE_ONE     = 0x01
+AK8963_MODE_C8HZ    = 0x02
+AK8963_MODE_C100HZ  = 0x06
+
+AK8963_BIT_14       = 0x00
+AK8963_BIT_16       = 0x01
+
+def dataConv(data1, data2):
+    value = data1 | (data2 << 8)
+    if (value & (1 << 16 -1)):
+        value -= (1 << 16)
+    return value
+
+class AK8963(i2c_device.i2c_device):
     
-    def __init__(self, address=ADDRESS):
-        self.mpu_device = i2c_device.i2c_device(address)
+    def __init__(self):
+        super().__init__(addr=ADDRESS_AK8963)
+        self.configAK8963(AK8963_MODE_C8HZ, AK8963_BIT_16)
+
+    def configAK8963(self, mode, mfs):
+        if mfs == AK8963_BIT_14:
+            self.mres = 4912.0/8190.0
+        else:
+            self.mres = 4912.0/32760.0
+        self.write_cmd_arg(AK8963_CNTL1, 0x00)
+        self.write_cmd_arg(AK8963_CNTL1, 0x0f)
+        data = self.read_i2c_block_data(AK8963_ASAX, 3)
+
+        self.magXcoef = (data[0] - 128) / 256 + 1.0
+        self.magYcoef = (data[1] - 128) / 256 + 1.0
+        self.magZcoef = (data[2] - 128) / 256 + 1.0
+    
+        self.write_cmd_arg(AK8963_CNTL1, 0x00)
+        self.write_cmd_arg(AK8963_CNTL1, (mfs << 4 | mode))
+    
+    def readMagnet(self):
+        x = 0
+        y = 0
+        z = 0
+        drdy = self.read_data(AK8963_ST1)
+        if drdy & 0x01:
+            data = self.read_i2c_block_data(AK8963_MAGNET_OUT, 7)
+            if (data[6] & 0x08) != 0x08:
+                x = dataConv(data[1], data[0])
+                y = dataConv(data[3], data[2])
+                z = dataConv(data[5], data[4])
+                
+                x = round(x * self.mres * self.magXcoef, 3)
+                y = round(y * self.mres * self.magYcoef, 3)
+                z = round(z * self.mres * self.magZcoef, 3)
+
+        return {'x': x, 'y': y, 'z': z}
+
+class MPU9250(i2c_device.i2c_device):
+    
+    def __init__(self):
+        super().__init__(ADDRESS)
         self.configMPU9250(GFS_250, AFS_2G)
 
     def searchDevice(self):
@@ -72,28 +132,27 @@ class MPU9250:
         else:
             self.ares = 16.0 / 32768.0
 
-        self.mpu_device.write_cmd_arg(PWR_MGMT_1, 0x00)
+        self.write_cmd_arg(PWR_MGMT_1, 0x00)
         time.sleep(0.1)
-        self.mpu_device.write_cmd_arg(PWR_MGMT_1, 0x01)
+        self.write_cmd_arg(PWR_MGMT_1, 0x01)
         time.sleep(0.1)
-        self.mpu_device.write_cmd_arg(CONFIG, 0x03)
-        self.mpu_device.write_cmd_arg(SMPLRT_DIV, 0x04)
-        self.mpu_device.write_cmd_arg(GYRO_CONFIG, gfs << 3)
-        self.mpu_device.write_cmd_arg(ACCEL_CONFIG, afs << 3)
-        self.mpu_device.write_cmd_arg(ACCEL_CONFIG_2, 0x03)
-        self.mpu_device.write_cmd_arg(INT_PIN_CFG, 0x02)
+        self.write_cmd_arg(CONFIG, 0x03)
+        self.write_cmd_arg(SMPLRT_DIV, 0x04)
+        self.write_cmd_arg(GYRO_CONFIG, gfs << 3)
+        self.write_cmd_arg(ACCEL_CONFIG, afs << 3)
+        self.write_cmd_arg(ACCEL_CONFIG_2, 0x03)
+        self.write_cmd_arg(INT_PIN_CFG, 0x02)
         time.sleep(0.1)
 
     def checkDataReady(self):
-        drdy = self.mpu_device.read_data(INT_STATUS)
+        drdy = self.read_data(INT_STATUS)
         return drdy & 0x01
 
-
     def readAccel(self):
-        data = self.mpu_device.read_i2c_block_data(ACCEL_OUT, 6)
-        x = self.dataConv(data[1], data[0])
-        y = self.dataConv(data[3], data[2])
-        z = self.dataConv(data[5], data[4])
+        data = self.read_i2c_block_data(ACCEL_OUT, 6)
+        x = dataConv(data[1], data[0])
+        y = dataConv(data[3], data[2])
+        z = dataConv(data[5], data[4])
 
         x = round(x * self.ares, 3)
         y = round(y * self.ares, 3)
@@ -102,21 +161,18 @@ class MPU9250:
         return {"x":x, "y":y, "z":z}
 
     def readGyro(self):
-        data = self.mpu_device.read_i2c_block_data(GYRO_OUT, 6)
+        data = self.read_i2c_block_data(GYRO_OUT, 6)
         
-        x = self.dataConv(data[1], data[0])
-        y = self.dataConv(data[3], data[2])
-        z = self.dataConv(data[5], data[4])
+        x = dataConv(data[1], data[0])
+        y = dataConv(data[3], data[2])
+        z = dataConv(data[5], data[4])
         x = round(x * self.gres, 3)
         y = round(y * self.gres, 3)
         x = round(z * self.gres, 3)
     
         return {"x":x, "y":y, "z":z}
 
-    def dataConv(self, data1, data2):
-        value = data1 | (data2 << 8)
-        if (value & (1 << 16 -1)):
-            value -= (1 << 16)
-        return value
+
+
 
 
