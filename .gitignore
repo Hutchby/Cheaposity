@@ -97,5 +97,8 @@ ENV/
 # mkdocs documentation
 /site
 
+# vim swap files
+*.swp
+
 # mypy
 .mypy_cache/
