@@ -58,17 +58,27 @@ class Direction:
 
     #use clockwise +-1, exclude 0
     def _rotate(self, speed, clock):
+        self.speed = speed
         self.apply(speed * clock, speed *-clock,
                    speed * clock, speed *-clock)
         return
 
     #direction +-1, exclude 0
     def _run(self, speed, direction):
-        self.apply(speed * direction, speed * direction,
+        self.speed = speed
+        self.direction = direction
+        sign = 1
+        if speed < self.speed:
+            sign = -1
+        while (self.speed == speed):
+            self.speed += sign * 10
+            self.apply(speed * direction, speed * direction,
                    speed * direction, speed * direction)
+            time.sleep(3)
         return
 
     def clean(self):
+        self.speed = 0
         self.apply(0, 0, 0, 0)
         return
 
@@ -80,12 +90,12 @@ class Direction:
 if __name__ == '__main__':
     print("Demo: Motor test")
 
-    if not Path("/dev/input/event0").is_file():
+    if not Path("/dev/input/event0").exists():
         print('No Bluetooth Controler for test')
         sys.exit(0)
 
-    rover=Direction(M1=apimotor.Motor(0), M4=apimotor.Motor(1), config=0)
-    gamepad = InputDevice('/dev/input/event0')        
+    rover=Direction(M1=apimotor.Motor(14), M4=apimotor.Motor(15), config=0)
+    gamepad = InputDevice('/dev/input/event0')
     aBtn = 315
     bBtn = 311
     xBtn = 307
@@ -93,7 +103,8 @@ if __name__ == '__main__':
     start = 305
     select = 314
     Trig = 313
-    speed=1
+    speed = 1
+    sign = 1
 
     for event in gamepad.read_loop():
         #filters by event type
@@ -102,26 +113,31 @@ if __name__ == '__main__':
             if event.value == 1:
                 if event.code == xBtn:
                     print("X")
-                    rover._run(speed, 1)
+                    rover._run(speed, sign)
                 elif event.code == yBtn:
                     print("Y")
-                    rover._rotate(speed, -1)
+                    rover._rotate(speed, sign)
                 elif event.code == bBtn:
                     print("B")
-                    rover._run(speed, -1)
+                    sign = -1
+                    rover._run(speed, sign)
                 elif event.code == aBtn:
                     print("A")
-                    rover._rotate(speed, 1)
+                    rover._rotate(speed, sign)
 
                 elif event.code == start:
                     print("Start")
                     speed = speed + 5
+                    rover._run(speed, sign)
                     print("Speed: ", speed)
                 elif event.code == select:
                     print("Select")
+                    rover._run(speed, sign)
                     speed = speed - 5
                     print("Speed: ", speed)
                 elif event.code == Trig:
                     print("Bumper")
+                    speed = 0
+                    sign = 1
                     rover._run(0, 1)
     GPIO.cleanup()

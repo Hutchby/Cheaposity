@@ -27,7 +27,7 @@ class Motor:
     
     def pwm(self, speed):
         self.speed = speed
-        self.adapwm.set_pwm(self.pin, 0, self.convert(speed * coeff))
+        self.adapwm.set_pwm(self.pin, 0, self.convert(speed)) # * self.coeff
         return
 
     
