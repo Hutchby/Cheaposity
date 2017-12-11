@@ -19,7 +19,7 @@ def do_POST_method(self, *args, **kwargs):
   payload_data = kwargs['data']
 ```
 
-# Example
+## Example
 
 If the client sends this json payload through a POST method:
 
