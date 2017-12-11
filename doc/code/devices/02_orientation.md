@@ -1,15 +1,18 @@
 # Direction Module
 
-The direction module is a simple module to get the spatial orientation of the rover.
+The direction module is a simple module to get the spatial orientation of the 
+rover.
 It's based on pitch, roll and azimuth (yell).
 
-the pitch and roll of both drone and rover are known, it's the main data for 
-engaging the 
+the pitch and roll of both drone and rover needs to be known before landing the 
+drone on the rover
 
 Each are calculated from the accelerometer, magnetometer, and gyroscope device.
 
 Accelerometer and  gyroscope are read from the MPU9250 and the magnetometer 
 comes from the AK8963
+
+Azimuth is used to find the way to the drone and keep the rover in its direction
 
 Here are the functions prototypes:
 
@@ -20,4 +23,4 @@ pitch(vect)
 roll(vect)
 ```
 
-Where vect is a vector (x, y, z)
+* vect: vector (acceleration, gyroscope, magnetometer)

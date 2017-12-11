@@ -13,7 +13,5 @@ communicate with the device.
 lcd_display_string(string, line)
 ```
 
-With:
-
 * string: is the string to display (with a maximum length of 20)
 * line: the line where to display the string (0 to 3)
