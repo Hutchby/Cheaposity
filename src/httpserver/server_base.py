@@ -14,8 +14,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.post_data = self.rfile.read(rfile_len)
         qs = self.post_data.decode("utf-8")
         qs = unquote(qs)
-        args = urllib.parse.parse_qsl(qs)
-        args = dict(args)
+        args = json.loads(qs)
         errors = []
         messages = []
         for key in args.keys():
@@ -27,8 +26,12 @@ class RequestHandler(BaseHTTPRequestHandler):
                 error_message = "error: method {} not implemented".format("do_POST_" + key)
                 errors.append(error_message)
                 continue
-            method_data = args[key].replace("'", "\"")
-            method(self.server, data=json.loads(method_data))
+            method_data = args[key]
+            try:
+                method(self.server, data=method_data)
+            except Exception as e:
+                print(e)
+                print(method_data)
         if errors:
             self.send_response(501)
             self.send_header("content-type", "application/json")
@@ -46,9 +49,16 @@ class RequestHandler(BaseHTTPRequestHandler):
             path = self.path.split("?")
             path[0] = path[0][1:]
             method = getattr(self.server, "do_GET_" + path[0])
-            method_kwargs = dict(urllib.parse.parse_qsl(path[1]))
+            if len(path) > 1:
+                method_kwargs = dict(urllib.parse.parse_qsl(path[1]))
+            else:
+                method_kwargs = {}
         except Exception as e:
             print(e)
+            self.send_response(501)
+            self.send_header('content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'error': str(e)}).encode('utf-8'))
         response = method(self.server, **method_kwargs)
         self.send_response(200)
         self.send_header('content-type', 'application/json')
