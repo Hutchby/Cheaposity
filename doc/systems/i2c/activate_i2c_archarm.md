@@ -1,3 +1,5 @@
+```sh
+
 pacman -Suy i2c-tools
 
 modprobe i2c-dev
@@ -12,3 +14,5 @@ device_tree_param=i2c1=on
 device_tree_param=spi=on
 
 i2cdetect -y 0
+
+```
