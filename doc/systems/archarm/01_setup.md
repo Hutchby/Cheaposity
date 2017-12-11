@@ -25,3 +25,10 @@ properly:
 
 The source code and the sources of this project are available on
 [our github](https://github.com/Hutchby/Cheaposity)
+
+# Setup
+
+## I2C
+
+These commands show how to setup I2C on a Raspberry Pi 3:
+
