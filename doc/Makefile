@@ -4,6 +4,7 @@ SRC+=systems/i2c/*.md
 SRC+=code/devices/*.md
 SRC+=code/driver/*.md
 SRC+=code/httpserver/*.md
+#SRC+=mechanical/*.md
 
 BIN=doc.pdf
 
