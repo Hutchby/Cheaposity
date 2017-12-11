@@ -18,11 +18,13 @@ Outline of wheel's disposition:
 (F) : freewheel
 (M) : motorized wheel
 
+```
 (M)------(F)
-  |	  |
-  |	  |
-  |	  |
+  |       |
+  |       |
+  |       |
 (F)------(M)
+```
 
 ## Case
 
@@ -46,4 +48,4 @@ Outline of wheel's disposition:
 ## Battery
 
   The voltage choosen is 12V. Be careful to the comsuption of the motor at full
-  accelleration, it can be regulate by software to slow down the acceleration.
+  acceleration, it can be regulated by software to slow down the acceleration.
