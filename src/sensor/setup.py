@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = 'pfe_sensor',
-    package = ['sensor'],
+    package = ['orientation'],
     version = '0.0.1',
     author = 'Maxime Gaudron',
     author_email = 'gaudro_m@epita.fr',

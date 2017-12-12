@@ -1,4 +1,3 @@
-from i2c import gyrodriver
 import math
 import time
 
