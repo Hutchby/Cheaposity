@@ -47,10 +47,13 @@ class Sonar:
     def measure_average(self):
         # This function takes 3 measurements and
         # returns the average.
+        print("sonar: measure 1")
         distance1 = self.measure()
         time.sleep(0.1)
+        print("sonar: measure 2")
         distance2 = self.measure()
         time.sleep(0.1)
+        print("sonar: measure 3")
         distance3 = self.measure()
         distance = distance1 + distance2 + distance3
         distance = distance / 3

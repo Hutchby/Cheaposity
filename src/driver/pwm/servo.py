@@ -17,5 +17,6 @@ class servoMG996R:
         self.pwm.set_pwm_freq(60)
 
     def rotate(self, value):
+        print("servo: rotate {}".format(value))
         self.pwm.set_pwm(self.channel, 0, ((int)((self.max - self.min) * value) + self.min))
         time.sleep(1)
