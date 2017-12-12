@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import serial
-from i2c import lcddriver
+import sys
+#from i2c import lcddriver
 
 """ The GPS transmits the following datas:
     - GNGLL
@@ -69,13 +70,15 @@ class GPSScreen:
 
     def __init__(self, gps):
         self.gps = gps
-        self.lcd = lcddriver.lcd()
+        #self.lcd = lcddriver.lcd()
 
     def clear(self):
-        self.lcd.lcd_clear()
+        #self.lcd.lcd_clear()
+        pass
 
     def display(self):
-        self.lcd.lcd_display_string(str(gps), 1)
+        #self.lcd.lcd_display_string(str(gps), 1)
+        print(self.gps)
 
     def update(self):
         self.gps.update()
