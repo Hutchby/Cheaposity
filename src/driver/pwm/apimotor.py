@@ -4,7 +4,7 @@ import signal
 import sys
 
 # Import the PCA9685 module.
-import i2c import PCA9685
+from i2c import PCA9685
 
 class Motor:
     def __init__(self, channel, polarity=False, pullspeed=0, coeff=1):
