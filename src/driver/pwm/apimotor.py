@@ -1,18 +1,15 @@
 from __future__ import division
-import RPi.GPIO as GPIO
 import time
 import signal
 import sys
 
 # Import the PCA9685 module.
-import Adafruit_PCA9685
+import i2c import PCA9685
 
 class Motor:
-    def __init__(self, pin, polarity=False, pullspeed=0, coeff=1):
-        if GPIO.getmode() == None:
-            GPIO.setmode(GPIO.BCM)
-        self.pin = pin
-        self.adapwm = Adafruit_PCA9685.PCA9685()
+    def __init__(self, channel, polarity=False, pullspeed=0, coeff=1):
+        self.channel = channel
+        self.pwm = PCA9685.PCA9685()
         self.adapwm.set_pwm_freq(60)
         self.pwmmin = 250
         self.pwmmax = 500
@@ -33,13 +30,11 @@ class Motor:
     def topwm(self, speed):
         return self.pwmmean + self.pwmwide * speed / 200
 
-    #var: speed = +-100%
     def pwm(self, speed):
-        #speed = self.algo(speed)
         speed = self.topwm(speed)
         self.speed = speed * self.coeff
-        self.adapwm.set_pwm(self.pin, 0, int(self.speed)) # * self.coeff
-        print("pin: ", self.pin, " pwm:", self.speed, "(", speed, ")")
+        self.pwm.set_pwm(self.channel, 0, int(self.speed)) # * self.coeff
+        print("channel: ", self.channel, " pwm:", self.speed, "(", speed, ")")
         return
 
 
@@ -56,19 +51,3 @@ class Motor:
     def run(self, speed):
         self.start(speed)
         return
-
-
-if __name__ == '__main__':
-    print("Demo: Motor test")
-
-    M1=Motor(pin=14, coeff=1)
-    M2=Motor(pin=15, coeff=1)
-
-    #'''
-    while True:
-        #rot = int(input("rotation : "))
-        speed1 = int(input("M1 : "))
-        speed2 = int(input("M2 : "))
-
-        M1.pwm(speed1)
-        M2.pwm(speed2)
