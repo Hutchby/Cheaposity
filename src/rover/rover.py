@@ -1,7 +1,6 @@
-from pwm import servo
+from pwm import apimotor, servo
 from gpio import sonar
 from i2c import gyrodriver, lcddriver
-#import orientation
 import time
 
 class Rover:
@@ -13,6 +12,8 @@ class Rover:
         self.lcd =  lcddriver.lcd()
         self.gyroaccel = gyrodriver.MPU9250()
         self.magneto = gyrodriver.AK8963()
+        self.left_motor = apimotor.Motor(channel=15, coeff=1)
+        self.right_motor = apimotor.Motor(channel=7, coeff=.88)
 
     def do_scan(self):
         print("do_scan()")
@@ -33,7 +34,9 @@ class Rover:
     def run(self):
         print("rover running...")
         while True:
-            print(self.do_scan())
-            print("tick")
-        
+            #print(self.do_scan())
+            #print("tick")
+            self.left_motor.pwm(100)
+            self.right_motor.run(100)
+
 

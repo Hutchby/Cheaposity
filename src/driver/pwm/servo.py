@@ -13,7 +13,6 @@ class servoMG996R:
         pulse_length //= 4096
         pulse *= 1000
         pulse //= pulse_length
-        self.pwm.set_pwm(channel, 0, pulse)
         self.pwm.set_pwm_freq(60)
 
     def rotate(self, value):

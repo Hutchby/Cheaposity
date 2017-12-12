@@ -9,7 +9,7 @@ from i2c import PCA9685
 class Motor:
     def __init__(self, channel, polarity=False, pullspeed=0, coeff=1):
         self.channel = channel
-        self.pwm = PCA9685.PCA9685()
+        self.adapwm = PCA9685.PCA9685()
         self.adapwm.set_pwm_freq(60)
         self.pwmmin = 250
         self.pwmmax = 500
@@ -33,7 +33,7 @@ class Motor:
     def pwm(self, speed):
         speed = self.topwm(speed)
         self.speed = speed * self.coeff
-        self.pwm.set_pwm(self.channel, 0, int(self.speed)) # * self.coeff
+        self.adapwm.set_pwm(self.channel, 0, int(self.speed)) # * self.coeff
         print("channel: ", self.channel, " pwm:", self.speed, "(", speed, ")")
         return
 
