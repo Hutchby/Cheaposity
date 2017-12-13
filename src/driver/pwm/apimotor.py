@@ -16,7 +16,6 @@ class Motor:
         self.pwmmean = (self.pwmmax + self.pwmmin) / 2
         self.pwmwide = self.pwmmax - self.pwmmin
         self.coeff = coeff
-        return
 
     def algo(self, speed):
         if speed == 0:
@@ -30,11 +29,14 @@ class Motor:
     def topwm(self, speed):
         return self.pwmmean + self.pwmwide * speed / 200
 
+    def stop(self):
+        self.adapwm.set_pwm(self.channel, 0, 375) # * self.coeff
+
     def pwm(self, speed):
-        speed = self.topwm(speed)
-        self.speed = speed * self.coeff
-        self.adapwm.set_pwm(self.channel, 0, int(self.speed)) # * self.coeff
-        print("channel: ", self.channel, " pwm:", self.speed, "(", speed, ")")
+        speed = self.topwm(speed * self.coeff)
+        print(self.coeff)
+        self.adapwm.set_pwm(self.channel, 0, int(speed)) # * self.coeff
+        print("channel: ", self.channel, " pwm:", speed, "(", speed, ")")
         return
 
 
