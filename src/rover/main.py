@@ -7,10 +7,11 @@ from threading import Thread
 
 def signal_handler(signal, frame):
     print("CLEAN UP GPIO")
+    time.sleep(1) # waiting the end of rover thread
+    rover.left_motor.stop()
+    time.sleep(1) # waiting the end of rover thread
+    rover.right_motor.stop()
     GPIO.cleanup()
-    rover.left_motor.pwm(0)
-    rover.right_motor.pwm(0)
-    time.sleep(1)
     print("EXIT")
     sys.exit(0)
 
