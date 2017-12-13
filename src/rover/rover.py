@@ -12,8 +12,8 @@ class Rover:
         self.lcd =  lcddriver.lcd()
         self.gyroaccel = gyrodriver.MPU9250()
         self.magneto = gyrodriver.AK8963()
-        self.left_motor = apimotor.Motor(channel=15, coeff=0.5)
-        self.right_motor = apimotor.Motor(channel=7, coeff=0.8)
+        self.left_motor  = apimotor.Motor(channel=15, coeff=0.5)
+        self.right_motor = apimotor.Motor(channel=14, coeff=0.8)
 
     def do_scan(self):
         print("do_scan()")
@@ -34,9 +34,7 @@ class Rover:
     def run(self):
         print("rover running...")
         while True:
-            print(self.do_scan())
+            #print(self.do_scan())
             print("tick")
-            self.left_motor.pwm(100)
-            self.right_motor.pwm(100)
-
-
+            self.left_motor.run(100)
+            self.right_motor.run(100)

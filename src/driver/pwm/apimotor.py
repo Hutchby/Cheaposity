@@ -16,7 +16,9 @@ class Motor:
         self.pwmmean = (self.pwmmax + self.pwmmin) / 2
         self.pwmwide = self.pwmmax - self.pwmmin
         self.coeff = coeff
+        self.stop()
 
+    # Apply an algo to correct ignore a death zone around zero
     def algo(self, speed):
         if speed == 0:
             return 0
@@ -25,31 +27,37 @@ class Motor:
             sign = -1
         return sign * 20 + speed * 4 / 5
 
-
+    # Convert speed (+-100) to a pwm value for motor)
     def topwm(self, speed):
         return self.pwmmean + self.pwmwide * speed / 200
 
-    def stop(self):
-        self.adapwm.set_pwm(self.channel, 0, 375) # * self.coeff
-
-    def pwm(self, speed):
-        speed = self.topwm(speed * self.coeff)
-        print(self.coeff)
-        self.adapwm.set_pwm(self.channel, 0, int(speed)) # * self.coeff
-        print("channel: ", self.channel, " pwm:", speed, "(", speed, ")")
+    # Apply the desire speed to the motor
+    def run(self, speed):
+        speed = speed * self.coeff
+        speed = self.algo(speed)
+        pwm   = self.topwm(speed)
+        self.adapwm.set_pwm(self.channel, 0, int(pwm))
+        print("channel: ", self.channel, " speed:", speed, " pwm:", pwm)
         return
-
 
     def start(self, speed):
-        self.pwm(speed)
-        return
-
-
-    def stop(self):
-        self.start(0)
-        return
-
-
-    def run(self, speed):
         self.start(speed)
         return
+
+    # Apply the null speed rotation
+    def stop(self):
+        self.adapwm.set_pwm(self.channel, 0, int (self.pwmmean))
+        print("channel: ", self.channel, " stop!")
+
+
+# Some Tests.
+if __name__ == "__main__":
+    print("Demo: Motor test")
+    M1 = Motor(channel=14, coeff=1)
+    M2 = Motor(channel=15, coeff=1)
+    #rot = int(input("rotation : "))
+    M1.run(50)
+    M2.run(50)
+    time.sleep(10)
+    M1.stop()
+    M2.stop()
